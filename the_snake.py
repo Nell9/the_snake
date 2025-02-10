@@ -41,14 +41,17 @@ clock = pygame.time.Clock()
 
 class GameObject:
     """Описывает все игровые обьекты."""
+
     position: tuple[int, int]
     body_color: tuple[int, int, int]
 
     def __init__(self):
         self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        
+
     def draw(self):
-        pass
+        rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
+        pygame.draw.rect(screen, self.body_color, rect)
+        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 class Apple(GameObject):
@@ -61,23 +64,24 @@ class Apple(GameObject):
 
     def randomize_position(self) -> tuple[int, int]:
         """Возвращает случайную позицию ячейки"""
-        return (randint(0, GRID_WIDTH), randint(0, GRID_HEIGHT))
-    
-    def draw(self):
-        rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-        pygame.draw.rect(screen, self.body_color, rect)
-        
-    
+        x = (randint(0, SCREEN_WIDTH) % GRID_SIZE) * GRID_SIZE
+        y = (randint(0, SCREEN_HEIGHT) % GRID_SIZE) * GRID_SIZE
+        self.position = (x, y)
+        return (x, y)
+
 
 class Snake(GameObject):
     """Класс описывающий сущность <Змейка>."""
-    _positions: list = []
-    __next_direction: tuple | None = None
+
+    positions: list = []
+    next_direction: tuple | None = None
+    direction: tuple = RIGHT
     __lenght: int = 1
-    _direction: tuple = RIGHT
-    
+    last: tuple | None = None
+
     def __init__(self):
         super().__init__()
+        self.positions.append(self.position)
         self.body_color = SNAKE_COLOR
 
     def update_direction(self):
@@ -85,32 +89,62 @@ class Snake(GameObject):
             self.direction = self.next_direction
             self.next_direction = None
 
-    def move(self):
-        ...
+    def move(self, apple_position):
+        self.last = self.positions[-1]
+        
+        if self.next_direction:
+            self.direction = self.next_direction
+            self.next_direction = None
+
+        if apple_position == self.position:
+            self.positions.insert(0, apple_position)
+            return True
+        
+        for index in range(1, len(self.positions)):
+            self.positions[index] = self.positions[index - 1]
+            
+        position_with_direction = tuple(
+            x * y for x, y in zip(self.direction, (GRID_SIZE, GRID_SIZE))
+        )
+        position_head = tuple(
+            x + y for x, y in zip(self.positions[0], position_with_direction)
+        )
+
+        if position_head[0] >= SCREEN_WIDTH:
+            position_head = (0, position_head[1])
+        elif position_head[0] < 0:
+            position_head = (SCREEN_WIDTH, position_head[1])
+
+        if position_head[1] >= SCREEN_HEIGHT:
+            position_head = (position_head[0], 0)
+        elif position_head[1] < 0:
+            position_head = (position_head[0], SCREEN_HEIGHT)
+
+        if position_head in self.positions:
+            self.reset
+        
+        self.position = position_head
+        
+        self.positions[0] = position_head
+        return False
 
     def draw(self):
-        for position in self.positions[:-1]:
-            rect = (pygame.Rect(position, (GRID_SIZE, GRID_SIZE)))
-            pygame.draw.rect(screen, self.body_color, rect)
-            pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+        for self.position in self.positions:
+            super().draw()
 
-        #Отрисовка головы змейки.
-        head_rect = pygame.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
-        pygame.draw.rect(screen, self.body_color, head_rect)
-        pygame.draw.rect(screen, BORDER_COLOR, head_rect, 1)
-
-        #Затирание последнего сегмента.
         if self.last:
             last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
-    
-    @property
-    def get_head_position(self):
-        ...
-    
-    def reset(self):
-        ...
 
+    @property
+    def get_head_position(self): ...
+
+    def reset(self):
+        self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
+        self.direction = RIGHT
+
+
+        
 
 def handle_keys(game_object):
     """Обработчик событий."""
@@ -128,6 +162,7 @@ def handle_keys(game_object):
             elif event.key == pygame.K_RIGHT and game_object.direction != LEFT:
                 game_object.next_direction = RIGHT
 
+
 def main():
     # Инициализация PyGame:
     pygame.init()
@@ -136,18 +171,23 @@ def main():
     snake = Snake()
 
     running = True
-    
+
     while running:
         handle_keys(snake)
-        
+        snake.draw()
         apple.draw()
-        pygame.display.flip()
+        apple_was_eat = snake.move(apple.position)
+        if apple_was_eat:
+            apple.randomize_position()
+        
+        
+
+        pygame.display.update()
         clock.tick(SPEED)
+
 
 if __name__ == "__main__":
     main()
-
-
 
 
 # Метод draw класса Snake.
