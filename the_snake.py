@@ -91,7 +91,7 @@ class Snake(GameObject):
 
     def move(self, apple_position):
         self.last = self.positions[-1]
-        
+
         if self.next_direction:
             self.direction = self.next_direction
             self.next_direction = None
@@ -114,15 +114,12 @@ class Snake(GameObject):
             position_head = (position_head[0], SCREEN_HEIGHT)
 
         if position_head in self.positions:
-            print(1)
             self.reset()
 
-        print(position_head)
-        print("все: ", self.positions)
         if apple_position == position_head:
             self.positions.insert(0, apple_position)
             return True
-        
+
         self.positions.insert(0, position_head)
         del self.positions[-1]
         return False
@@ -142,12 +139,11 @@ class Snake(GameObject):
         for position in self.positions:
             last_rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
-            
+
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
         self.direction = RIGHT
         pygame.display.flip()
 
-        
 
 def handle_keys(game_object):
     """Обработчик событий."""
@@ -182,8 +178,6 @@ def main():
         apple_was_eat = snake.move(apple.position)
         if apple_was_eat:
             apple.randomize_position()
-        
-        
 
         pygame.display.update()
         clock.tick(SPEED)
