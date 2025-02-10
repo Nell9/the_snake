@@ -27,7 +27,7 @@ APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 
 # Скорость движения змейки:
-SPEED = 20
+SPEED = 15
 
 # Настройка игрового окна:
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
@@ -96,13 +96,6 @@ class Snake(GameObject):
             self.direction = self.next_direction
             self.next_direction = None
 
-        if apple_position == self.position:
-            self.positions.insert(0, apple_position)
-            return True
-        
-        for index in range(1, len(self.positions)):
-            self.positions[index] = self.positions[index - 1]
-            
         position_with_direction = tuple(
             x * y for x, y in zip(self.direction, (GRID_SIZE, GRID_SIZE))
         )
@@ -121,11 +114,17 @@ class Snake(GameObject):
             position_head = (position_head[0], SCREEN_HEIGHT)
 
         if position_head in self.positions:
-            self.reset
+            print(1)
+            self.reset()
+
+        print(position_head)
+        print("все: ", self.positions)
+        if apple_position == position_head:
+            self.positions.insert(0, apple_position)
+            return True
         
-        self.position = position_head
-        
-        self.positions[0] = position_head
+        self.positions.insert(0, position_head)
+        del self.positions[-1]
         return False
 
     def draw(self):
@@ -140,9 +139,13 @@ class Snake(GameObject):
     def get_head_position(self): ...
 
     def reset(self):
+        for position in self.positions:
+            last_rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
+            pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
+            
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
         self.direction = RIGHT
-
+        pygame.display.flip()
 
         
 
