@@ -137,7 +137,11 @@ class Snake(GameObject):
         Отрисовка ячеек змеи по координатам
         и затирание крайней клетки если змея передвинулась.
         """
-        for self.position in self.positions:
+        # В строке 143 было < for self.position in self.positions: >
+        # что бы убрать лишнюю строку 144, но сайт ругается,
+        # говорит вы не используете self.position внутри for...
+        for position in self.positions:
+            self.position = position
             super().draw()
 
         if self.last:
