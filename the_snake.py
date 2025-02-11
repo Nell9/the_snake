@@ -47,7 +47,7 @@ class GameObject:
 
     def __init__(self):
         self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-       
+
     def draw(self):
         """Отрисовка контура и заливка одной ячейки"""
         rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
@@ -94,7 +94,7 @@ class Snake(GameObject):
     def move(self, apple_position: tuple[int, int]):
         """
         Отрисовывает змейку, проверяет сьедено ли яблоко.
-        
+
         Параметры:
             apple_position: tuple[int, int] - Координаты яблока.
         """
@@ -134,7 +134,7 @@ class Snake(GameObject):
 
     def draw(self):
         """
-        Отрисовка ячеек змеи по координатам 
+        Отрисовка ячеек змеи по координатам
         и затирание крайней клетки если змея передвинулась.
         """
         for self.position in self.positions:
@@ -155,7 +155,7 @@ class Snake(GameObject):
         pygame.display.flip()
 
     @property
-    def get_head_position(self): 
+    def get_head_position(self):
         """
         Голова змеи всегда выражается первым элементом змеи,
         Змея представленна списком positions, по этому голова всегда в
