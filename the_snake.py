@@ -47,13 +47,12 @@ class GameObject:
 
     def __init__(self):
         self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        
+       
     def draw(self):
         """Отрисовка контура и заливка одной ячейки"""
         rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(screen, self.body_color, rect)
         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
-
 
 
 class Apple(GameObject):
@@ -183,6 +182,7 @@ def handle_keys(game_object):
 
 
 def main():
+    """Ну main, хз что написать"""
     # Инициализация PyGame:
     pygame.init()
     # Objects:
