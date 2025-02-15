@@ -66,7 +66,7 @@ class Apple(GameObject):
     def __init__(
             self, color: tuple = None,
             border_color: tuple = None,
-            reserved_positions: list = []):
+            reserved_positions: list = ()):
         super().__init__(color, border_color)
         self.reserved_positions = reserved_positions
         self.position = self.randomize_position()
