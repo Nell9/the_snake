@@ -66,7 +66,7 @@ class Apple(GameObject):
     def __init__(
             self, color: tuple = None,
             border_color: tuple = None,
-            reserved_positions: list = []):
+            reserved_positions: list = ()):
         super().__init__(color, border_color)
         self.reserved_positions = reserved_positions
         self.position = self.randomize_position()
@@ -151,12 +151,7 @@ class Snake(GameObject):
         position_with_direction = tuple(
             x1 * x2 for x1, x2 in zip(self.direction, (GRID_SIZE, GRID_SIZE))
         )
-        position_head = tuple(
-            x1 + x2 for x1, x2 in zip(
-                self.positions[0],
-                position_with_direction)
-        )
-        # TODO
+
         position_head_x = (
             self.positions[0][0] + position_with_direction[0] + SCREEN_WIDTH
         ) % SCREEN_WIDTH
@@ -165,9 +160,7 @@ class Snake(GameObject):
             self.positions[0][1] + position_with_direction[1] + SCREEN_HEIGHT
         ) % SCREEN_HEIGHT
 
-        position_head = (position_head_x, position_head_y)
-
-        return position_head
+        return (position_head_x, position_head_y)
 
     @property
     def get_head_position(self):
@@ -226,9 +219,9 @@ def main():
         if apple_was_eat:
             player_score += 1
             pg.display.set_caption(
-                f'''
+                f"""
                 Змейка. speed: {SPEED}, score: {player_score}
-                ''')
+                """)
             apple.randomize_position()
 
         snake.draw()
