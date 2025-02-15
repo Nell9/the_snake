@@ -31,10 +31,12 @@ pg.display.set_caption(f'Змейка. speed: {SPEED}, score: 0')
 # Настройка времени:
 clock = pg.time.Clock()
 
+#
+clr = (0, 0, 0)
 
 class GameObject:
     """Описывает все игровые обьекты."""
-    def __init__(self, body_color: tuple, border_color: tuple) :
+    def __init__(self, body_color: tuple = None, border_color: tuple = None):
         self.body_color: tuple[int, int, int] = body_color
         self.border_color: tuple[int, int, int] = border_color
         self.position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -58,11 +60,9 @@ class GameObject:
         pg.draw.rect(screen, border_color, rect, 1)
 
 
-
 class Apple(GameObject):
     """Класс описывающий сущность <Яблоко>."""
-
-    def __init__(self, color: tuple, border_color: tuple, reserved_positions: list):
+    def __init__(self, color: tuple = None, border_color: tuple = None, reserved_positions: list = []):
         super().__init__(color, border_color)
         self.reserved_positions = reserved_positions
         self.position = self.randomize_position()
@@ -83,7 +83,7 @@ class Apple(GameObject):
 
 class Snake(GameObject):
     """Класс описывающий сущность <Змейка>."""
-    def __init__(self, color: tuple, border_color: tuple):
+    def __init__(self, color: tuple = None, border_color: tuple = None):
         super().__init__(color, border_color)
         self.positions: list = []
         self.reset()
@@ -92,7 +92,7 @@ class Snake(GameObject):
         self.__lenght: int = 1
         self.last: tuple | None = None
 
-    def get_new_direction(self, new_direction):
+    def get_new_direction(self, new_direction: tuple = None):
         """Получает новое направление"""
         self.next_direction = new_direction
 
@@ -101,7 +101,7 @@ class Snake(GameObject):
         if self.next_direction: 
             self.direction = self.next_direction
         
-    def move(self, apple_position: tuple[int, int]):
+    def move(self, apple_position: tuple[int, int] = None):
         """
         Отрисовывает змейку, проверяет сьедено ли яблоко.
 
@@ -152,12 +152,12 @@ class Snake(GameObject):
         return position_head
 
     @property 
-    def head_position(self): 
+    def get_head_position(self): 
         """Возвращает позицию головы змеи"""
         return self.positions[0]
 
 
-def handle_keys(game_object: Snake):
+def handle_keys(game_object: Snake = None):
     """Обработчик событий."""
     events = {
         (LEFT, pg.K_UP): UP,
@@ -197,7 +197,7 @@ def main():
     while running:
         handle_keys(snake)
 
-        if snake.head_position in snake.positions[1:]:
+        if snake.get_head_position in snake.positions[1:]:
             snake.reset()
             player_score = 0
             pg.display.set_caption(f'Змейка. speed: {SPEED}, score: 0')
