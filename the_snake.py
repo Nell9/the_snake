@@ -27,9 +27,11 @@ SPEED = 15
 CENTRAL_POINT = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
 # Координаты всех ячеек поля:
-ALL_CELLS = set((x * GRID_SIZE, y * GRID_SIZE)
-                for x in range(GRID_SIZE)
-                for y in range(GRID_SIZE))
+ALL_CELLS = set(
+    (x * GRID_SIZE, y * GRID_SIZE)
+    for x in range(GRID_SIZE)
+    for y in range(GRID_SIZE)
+)
 
 # Допустимые изменения направления движения для обьекта Snake.
 TURNS = {
