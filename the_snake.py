@@ -129,7 +129,7 @@ class Snake(GameObject):
         Отрисовка ячеек змеи по координатам
         и затирание крайней клетки если змея передвинулась.
         """
-        self.draw_one_cell(self.head_position)
+        self.draw_one_cell(self.get_head_position())
         if self.last:
             self.draw_one_cell(self.last, BOARD_BACKGROUND_COLOR)
 
@@ -146,7 +146,7 @@ class Snake(GameObject):
         y_direction = self.direction[1]
         x_shift = x_direction * GRID_SIZE
         y_shift = y_direction * GRID_SIZE
-        position_head_x, position_head_y = self.head_position
+        position_head_x, position_head_y = self.get_head_position()
 
         position_head_x = (
             position_head_x + x_shift + SCREEN_WIDTH
@@ -158,8 +158,7 @@ class Snake(GameObject):
 
         return (position_head_x, position_head_y)
 
-    @property
-    def head_position(self):
+    def get_head_position(self):
         """Возвращает позицию головы змеи"""
         return self.positions[0]
 
@@ -202,12 +201,12 @@ def main():
     while running:
         handle_keys(snake)
 
-        if (snake.head_position in snake.positions[1:]
+        if (snake.get_head_position() in snake.positions[1:]
                 or apple.position == snake.get_new_head_position()):
             pg.display.set_caption(
                 f'Змейка. speed: {SPEED}, score: {player_score}')
 
-        if snake.head_position in snake.positions[1:]:
+        if snake.get_head_position() in snake.positions[1:]:
             player_score = 0
             snake.reset()
             apple.randomize_position(apple.position)
