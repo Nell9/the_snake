@@ -181,8 +181,8 @@ def handle_keys(snake: Snake = None):
 
 def drawing_and_delayed(*argv: list[GameObject]):
     """Отрисовывает обьекты и делает тик"""
-    for object in argv:
-        object.draw()
+    for game_object in argv:
+        game_object.draw()
     pg.display.update()
     clock.tick(SPEED)
 
