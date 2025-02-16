@@ -19,7 +19,6 @@ BOARD_BACKGROUND_COLOR = (112, 128, 144)
 BORDER_COLOR = (200, 200, 200)
 APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
-DEFAULT_OBJECT_COLOR = (255, 255, 255)
 
 # Скорость движения змейки:
 SPEED = 15
@@ -188,14 +187,11 @@ def main():
     snake = Snake()
     apple = Apple(reserved_positions=snake.positions)
     screen.fill(BOARD_BACKGROUND_COLOR)
+
     running = True
+
     while running:
         handle_keys(snake)
-
-        pg.display.set_caption(
-            f"""
-                Змейка. speed: {SPEED}, score: {player_score}
-                """)
 
         if snake.get_head_position() in snake.positions[1:]:
             snake.reset()
@@ -209,8 +205,11 @@ def main():
             apple.randomize_position(snake.positions)
         else:
             snake.move()
+
         apple.draw()
         snake.draw()
+        pg.display.set_caption(
+            f'Змейка. speed: {SPEED}, score: {player_score}')
         pg.display.update()
         clock.tick(SPEED)
 
