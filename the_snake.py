@@ -73,29 +73,22 @@ class GameObject:
         pg.draw.rect(screen, background_color, rect)
         if background_color == BOARD_BACKGROUND_COLOR:
             pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect, 1)
-        else:
-            pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 class Apple(GameObject):
     """Класс описывающий сущность <Яблоко>."""
 
     def __init__(
-            self, color: tuple = APPLE_COLOR,
-            reserved_positions: list | None = None):
-        reserved_positions = reserved_positions or []
+            self, color: tuple = APPLE_COLOR):
         super().__init__(color)
-        self.randomize_position(reserved_positions)
+        self.randomize_position(CENTRAL_POINT)
 
     def draw(self):
         """Отрисовка яблока"""
         self.draw_one_cell(self.position)
 
-    def randomize_position(
-            self,
-            reserved_positions: list | None = None):
+    def randomize_position(self, reserved_positions: list):
         """Возвращает случайную позицию ячейки."""
-        reserved_positions = reserved_positions or []
         self.position = choice(tuple(ALL_CELLS - set(reserved_positions)))
 
 
@@ -104,10 +97,7 @@ class Snake(GameObject):
 
     def __init__(self, color: tuple = SNAKE_COLOR):
         super().__init__(color)
-        self.positions: list = [CENTRAL_POINT]
-        self.direction: tuple = RIGHT
         self.reset()
-        self.getting_ready_to_eat_apple = False
 
     def update_direction(self, new_direction):
         """Обновляет направление движения."""
@@ -115,14 +105,12 @@ class Snake(GameObject):
 
     def move(self):
         """Передвигает змейку в текущую позицию"""
-        if self.getting_ready_to_eat_apple is True:
+        self.positions.insert(0, self.get_new_head_position())
+        if self.getting_ready_to_eat_apple:
             self.last = None
-            self.positions.insert(0, self.get_new_head_position())
             self.getting_ready_to_eat_apple = False
         else:
-            self.last = self.positions[-1]
-            self.positions.insert(0, self.get_new_head_position())
-            self.positions.pop()
+            self.last = self.positions.pop()
 
     def draw(self):
         """
@@ -138,7 +126,7 @@ class Snake(GameObject):
         self.positions = [CENTRAL_POINT]
         self.direction = RIGHT
         self.last = None
-        self.apple_was_eated = False
+        self.getting_ready_to_eat_apple = False
 
     def get_new_head_position(self):
         """Вычисляет новую позицию головы змеи."""
@@ -163,19 +151,23 @@ class Snake(GameObject):
         return self.positions[0]
 
 
-def handle_keys(snake: Snake = None):
+def exit_game():
+    """Выход из игры."""
+    pg.quit()
+    raise SystemExit
+
+
+def handle_keys(snake: Snake):
     """Обработчик событий."""
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            pg.quit()
-            raise SystemExit
+            exit_game()
         if event.type == pg.KEYDOWN:
             snake.update_direction(TURNS.get(
                 (snake.direction, event.key),
                 snake.direction))
             if event.key == pg.K_ESCAPE:
-                pg.quit()
-                raise SystemExit
+                exit_game()
 
 
 def drawing_and_delayed(*argv: list[GameObject]):
@@ -192,31 +184,30 @@ def main():
     pg.init()
     player_score = 0
     snake = Snake()
-    apple = Apple(reserved_positions=snake.positions)
+    apple = Apple()
     screen.fill(BOARD_BACKGROUND_COLOR)
-    pg.display.set_caption(
-        f'Змейка. speed: {SPEED}, score: {player_score}')
-
+    pg.display.set_caption('Змейка. Съешьте яблоко что бы начать.')
     running = True
     while running:
         handle_keys(snake)
+        snake.move()
+        snake.getting_ready_to_eat_apple = False
 
-        if (snake.get_head_position() in snake.positions[1:]
-                or apple.position == snake.get_new_head_position()):
-            pg.display.set_caption(
-                f'Змейка. speed: {SPEED}, score: {player_score}')
-
-        if snake.get_head_position() in snake.positions[1:]:
+        if snake.get_head_position() in snake.positions[3:]:
             player_score = 0
+            pg.display.set_caption(
+                'Змейка. Вы програли! Съешьте яблоко что бы начать.')
             snake.reset()
             apple.randomize_position(apple.position)
             screen.fill(BOARD_BACKGROUND_COLOR)
-        elif apple.position == snake.get_new_head_position():
+
+        elif apple.position == snake.get_head_position():
             player_score += 1
+            pg.display.set_caption(
+                f'Змейка. скорость: {SPEED}, счет: {player_score}')
             apple.randomize_position(snake.positions)
             snake.getting_ready_to_eat_apple = True
 
-        snake.move()
         drawing_and_delayed(apple, snake)
 
 
