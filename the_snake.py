@@ -134,16 +134,14 @@ class Snake(GameObject):
         """Вычисляет новую позицию головы змеи."""
         x_direction = self.direction[0]
         y_direction = self.direction[1]
-        x_shift = x_direction * GRID_SIZE
-        y_shift = y_direction * GRID_SIZE
         position_head_x, position_head_y = self.get_head_position()
 
         position_head_x = (
-            position_head_x + x_shift + SCREEN_WIDTH
+            position_head_x + x_direction * GRID_SIZE + SCREEN_WIDTH
         ) % SCREEN_WIDTH
 
         position_head_y = (
-            position_head_y + y_shift + SCREEN_HEIGHT
+            position_head_y + y_direction * GRID_SIZE + SCREEN_HEIGHT
         ) % SCREEN_HEIGHT
 
         return (position_head_x, position_head_y)
