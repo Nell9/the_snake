@@ -1,9 +1,6 @@
 import pygame as pg
 
-
 from random import choice
-from pygame.time import Clock
-
 
 # Константы для размеров поля и сетки:
 SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
@@ -52,7 +49,7 @@ TURNS = {
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 
 # Настройка времени:
-clock = Clock()
+clock = pg.time.Clock()
 
 
 class GameObject:
