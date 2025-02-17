@@ -129,7 +129,6 @@ class Snake(GameObject):
         self.positions = [CENTRAL_POINT]
         self.direction = RIGHT
         self.last = None
-        self.dont_pop_tail = False
 
     def get_new_head_position(self):
         """Вычисляет новую позицию головы змеи."""
