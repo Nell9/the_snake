@@ -184,6 +184,7 @@ def main():
             player_score += 1
             apple.randomize_position(snake.positions)
             snake.dont_pop_tail = True
+        
         pg.display.set_caption(
                 f'Змейка. Длина змеи: {player_score}')
         snake.draw()
