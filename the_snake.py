@@ -103,7 +103,7 @@ class Snake(GameObject):
         """Обновляет направление движения."""
         self.direction = new_direction
 
-    def move(self, ):
+    def move(self):
         """Передвигает змейку в текущую позицию"""
         self.positions.insert(0, self.get_new_head_position())
         if self.dont_pop_tail:
