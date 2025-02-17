@@ -73,15 +73,19 @@ class GameObject:
         background_color = background_color or self.body_color
         rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, background_color, rect)
+        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
+        if background_color == BOARD_BACKGROUND_COLOR:
+            pg.draw.rect(screen, background_color, rect, 1)
 
 
 class Apple(GameObject):
     """Класс описывающий сущность <Яблоко>."""
 
     def __init__(
-            self, color: tuple = APPLE_COLOR):
+            self, color: tuple = APPLE_COLOR, reserved_positions: list = []):
         super().__init__(color)
-        self.randomize_position(CENTRAL_POINT)
+        reserved_positions = reserved_positions or []
+        self.randomize_position(reserved_positions)
 
     def draw(self):
         """Отрисовка яблока"""
@@ -106,11 +110,11 @@ class Snake(GameObject):
     def move(self):
         """Передвигает змейку в текущую позицию"""
         self.positions.insert(0, self.get_new_head_position())
-        if self.dont_pop_tail:
-            self.last = None
-            self.dont_pop_tail = False
-        else:
-            self.last = self.positions.pop()
+        self.last = self.positions.pop()
+
+    def restore_tail(self):
+        """Восстанавливает хвост змеи"""
+        self.positions.insert(-1, self.last)
 
     def draw(self):
         """
@@ -143,45 +147,45 @@ class Snake(GameObject):
         """Возвращает позицию головы змеи"""
         return self.positions[0]
 
+    def __len__(self):
+        """Возвращает длину змеи."""
+        return len(self.positions)
+
 
 def handle_keys(snake: Snake):
     """Обработчик событий."""
     for event in pg.event.get():
-        if event.type == pg.QUIT:
+        if (event.type == pg.QUIT
+                or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE)):
             pg.quit()
             raise SystemExit
         if event.type == pg.KEYDOWN:
             snake.update_direction(TURNS.get(
                 (snake.direction, event.key),
                 snake.direction))
-            if event.key == pg.K_ESCAPE:
-                snake.reset()
 
 
 def main():
-    """Ну main, хз что написать"""
+    """Main."""
     # Инициализация pg:
     pg.init()
-    player_score = 0
     snake = Snake()
-    apple = Apple()
+    apple = Apple(reserved_positions=snake.positions)
     screen.fill(BOARD_BACKGROUND_COLOR)
 
     running = True
     while running:
         handle_keys(snake)
         snake.move()
-        if snake.get_head_position() in snake.positions[2:]:
-            player_score = 0
+        if snake.get_head_position() in snake.positions[4:]:
             snake.reset()
-            apple.randomize_position(apple.position)
+            apple.randomize_position(snake.positions)
             screen.fill(BOARD_BACKGROUND_COLOR)
         elif apple.position == snake.get_head_position():
-            player_score += 1
             apple.randomize_position(snake.positions)
-            snake.dont_pop_tail = True
+            snake.restore_tail()
 
-        pg.display.set_caption(f'Змейка. Длина змеи: {player_score}')
+        pg.display.set_caption(f'Змейка. Длина змеи: {len(snake)}')
         snake.draw()
         apple.draw()
         pg.display.update()
