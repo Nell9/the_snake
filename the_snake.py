@@ -158,10 +158,6 @@ def handle_keys(snake: Snake):
                 snake.reset()
 
 
-def drawing_and_delayed(*argv: list[GameObject]):
-    """Отрисовывает обьекты и делает тик"""
-
-
 def main():
     """Ну main, хз что написать"""
     # Инициализация pg:
