@@ -73,8 +73,6 @@ class GameObject:
         background_color = background_color or self.body_color
         rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, background_color, rect)
-        if background_color == BOARD_BACKGROUND_COLOR:
-            pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, rect, 1)
 
 
 class Apple(GameObject):
@@ -105,12 +103,12 @@ class Snake(GameObject):
         """Обновляет направление движения."""
         self.direction = new_direction
 
-    def move(self):
+    def move(self, ):
         """Передвигает змейку в текущую позицию"""
         self.positions.insert(0, self.get_new_head_position())
-        if self.getting_ready_to_eat_apple:
+        if self.dont_pop_tail:
             self.last = None
-            self.getting_ready_to_eat_apple = False
+            self.dont_pop_tail = False
         else:
             self.last = self.positions.pop()
 
@@ -128,54 +126,40 @@ class Snake(GameObject):
         self.positions = [CENTRAL_POINT]
         self.direction = RIGHT
         self.last = None
-        self.getting_ready_to_eat_apple = False
+        self.dont_pop_tail = False
 
     def get_new_head_position(self):
         """Вычисляет новую позицию головы змеи."""
-        x_direction = self.direction[0]
-        y_direction = self.direction[1]
+        x_direction, y_direction = self.direction
         position_head_x, position_head_y = self.get_head_position()
-
-        position_head_x = (
-            position_head_x + x_direction * GRID_SIZE + SCREEN_WIDTH
-        ) % SCREEN_WIDTH
-
-        position_head_y = (
-            position_head_y + y_direction * GRID_SIZE + SCREEN_HEIGHT
-        ) % SCREEN_HEIGHT
-
-        return (position_head_x, position_head_y)
+        return (
+            (position_head_x + (x_direction * GRID_SIZE) + SCREEN_WIDTH)
+            % SCREEN_WIDTH,
+            (position_head_y + (y_direction * GRID_SIZE) + SCREEN_HEIGHT)
+            % SCREEN_HEIGHT
+        )
 
     def get_head_position(self):
         """Возвращает позицию головы змеи"""
         return self.positions[0]
 
 
-def exit_game():
-    """Выход из игры."""
-    pg.quit()
-    raise SystemExit
-
-
 def handle_keys(snake: Snake):
     """Обработчик событий."""
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            exit_game()
+            pg.quit()
+            raise SystemExit
         if event.type == pg.KEYDOWN:
             snake.update_direction(TURNS.get(
                 (snake.direction, event.key),
                 snake.direction))
             if event.key == pg.K_ESCAPE:
-                exit_game()
+                snake.reset()
 
 
 def drawing_and_delayed(*argv: list[GameObject]):
     """Отрисовывает обьекты и делает тик"""
-    for game_object in argv:
-        game_object.draw()
-    pg.display.update()
-    clock.tick(SPEED)
 
 
 def main():
@@ -186,29 +170,26 @@ def main():
     snake = Snake()
     apple = Apple()
     screen.fill(BOARD_BACKGROUND_COLOR)
-    pg.display.set_caption('Змейка. Съешьте яблоко что бы начать.')
+
     running = True
     while running:
         handle_keys(snake)
         snake.move()
-        snake.getting_ready_to_eat_apple = False
-
-        if snake.get_head_position() in snake.positions[3:]:
+        if snake.get_head_position() in snake.positions[2:]:
             player_score = 0
-            pg.display.set_caption(
-                'Змейка. Вы програли! Съешьте яблоко что бы начать.')
             snake.reset()
             apple.randomize_position(apple.position)
             screen.fill(BOARD_BACKGROUND_COLOR)
-
         elif apple.position == snake.get_head_position():
             player_score += 1
-            pg.display.set_caption(
-                f'Змейка. скорость: {SPEED}, счет: {player_score}')
             apple.randomize_position(snake.positions)
-            snake.getting_ready_to_eat_apple = True
-
-        drawing_and_delayed(apple, snake)
+            snake.dont_pop_tail = True
+        pg.display.set_caption(
+                f'Змейка. Длина змеи: {player_score}')
+        snake.draw()
+        apple.draw()
+        pg.display.update()
+        clock.tick(SPEED)
 
 
 if __name__ == '__main__':
