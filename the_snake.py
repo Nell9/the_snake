@@ -73,9 +73,8 @@ class GameObject:
         background_color = background_color or self.body_color
         rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
         pg.draw.rect(screen, background_color, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
-        if background_color == BOARD_BACKGROUND_COLOR:
-            pg.draw.rect(screen, background_color, rect, 1)
+        if background_color != BOARD_BACKGROUND_COLOR:
+            pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 class Apple(GameObject):
