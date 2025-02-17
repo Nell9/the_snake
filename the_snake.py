@@ -82,10 +82,9 @@ class Apple(GameObject):
     """Класс описывающий сущность <Яблоко>."""
 
     def __init__(
-            self, color: tuple = APPLE_COLOR, reserved_positions: list = []):
+            self, color: tuple = APPLE_COLOR, reserved_positions: list = None):
         super().__init__(color)
-        reserved_positions = reserved_positions or []
-        self.randomize_position(reserved_positions)
+        self.randomize_position(reserved_positions or [])
 
     def draw(self):
         """Отрисовка яблока"""
@@ -185,7 +184,7 @@ def main():
             apple.randomize_position(snake.positions)
             snake.restore_tail()
 
-        pg.display.set_caption(f'Змейка. Длина змеи: {len(snake)}')
+        pg.display.set_caption('Змейка. Длина змеи: ' + str(len(snake)))
         snake.draw()
         apple.draw()
         pg.display.update()
